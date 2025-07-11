@@ -15,7 +15,7 @@ logging.basicConfig(
     datefmt='%Y-%m-%d %H:%M:%S'
 )
 
-def log_action(action: str, user: discord.User, target: discord.abc.User = None, reason: str = None, extra: str = None):
+def log_action(action: str, user: discord.abc.User, target: discord.abc.User = None, reason: str = None, extra: str = None):
     msg = f"{user} (ID: {user.id}) performed {action}"
     if target:
         msg += f" on {target} (ID: {target.id})"
@@ -39,10 +39,11 @@ async def load_commands():
             for file in category.glob("*.py"):
                 module_name = f"commands.{category.name}.{file.stem}"
                 spec = importlib.util.spec_from_file_location(module_name, file)
-                module = importlib.util.module_from_spec(spec)
-                spec.loader.exec_module(module)
-                if hasattr(module, "setup"):
-                    await module.setup(tree)
+                if spec and spec.loader:
+                    module = importlib.util.module_from_spec(spec)
+                    spec.loader.exec_module(module)
+                    if hasattr(module, "setup"):
+                        await module.setup(tree)
 
 @bot.event
 async def on_ready():
@@ -53,6 +54,18 @@ async def on_ready():
         print(f"globally synced {len(synced)} command(s)")
     except Exception as e:
         print(f"failed to globally sync commands: {e}")
+
+@bot.event
+async def on_app_command_completion(interaction: discord.Interaction, command: app_commands.Command):
+    user = interaction.user
+    channel = interaction.channel
+    logging.info(f"[SLASH] {user} (ID: {user.id}) ran /{command.name} in #{getattr(channel, 'name', 'DM')} (ID: {getattr(channel, 'id', 'DM')})")
+
+@bot.event
+async def on_command_completion(ctx):
+    user = ctx.author
+    channel = ctx.channel
+    logging.info(f"[PREFIX] {user} (ID: {user.id}) ran {ctx.command} in #{getattr(channel, 'name', 'DM')} (ID: {getattr(channel, 'id', 'DM')})")
 
 if __name__ == "__main__":
     TOKEN = os.getenv("TOKEN")
