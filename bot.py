@@ -5,6 +5,25 @@ import os
 from dotenv import load_dotenv
 import importlib.util
 import pathlib
+import logging
+
+# action logging
+logging.basicConfig(
+    filename='actions.log',
+    level=logging.INFO,
+    format='%(asctime)s | %(levelname)s | %(message)s',
+    datefmt='%Y-%m-%d %H:%M:%S'
+)
+
+def log_action(action: str, user: discord.User, target: discord.abc.User = None, reason: str = None, extra: str = None):
+    msg = f"{user} (ID: {user.id}) performed {action}"
+    if target:
+        msg += f" on {target} (ID: {target.id})"
+    if reason:
+        msg += f" | Reason: {reason}"
+    if extra:
+        msg += f" | {extra}"
+    logging.info(msg)
 
 load_dotenv()
 
@@ -38,5 +57,5 @@ async def on_ready():
 if __name__ == "__main__":
     TOKEN = os.getenv("TOKEN")
     if not TOKEN:
-        raise ValueError("please set the Token in .env.")
+        raise ValueError("please set the TOKEN in .env file")
     bot.run(TOKEN)
