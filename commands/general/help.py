@@ -47,9 +47,9 @@ class HelpDropdown(discord.ui.Select):
                 title="<:blurple_slashcommands:1392704368729526283> **Nexia Commands**",
                     description=(
                     "**General**\n"
-                    "``help``, ``invite``, ``ping``\n\n"
+                    "``help``, ``invite``, ``ping``, ``avatar``\n\n"
                     "**Moderation**\n"
-                    "``ban``, ``kick``, ``warn``, ``timeout``\n"
+                    "``ban``, ``kick``, ``warn``, ``timeout``, ``lock``, ``unlock``, ``purge``, ``say``\n"
             ),
                 color=discord.Color.purple()
             )
