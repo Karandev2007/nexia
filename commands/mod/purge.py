@@ -1,11 +1,19 @@
 import discord
 from discord import app_commands
+import os
+from dotenv import load_dotenv
+
+load_dotenv()
+ADMIN_ID = os.getenv("ADMIN_ID")
 
 async def setup(tree: app_commands.CommandTree):
-    @tree.command(name="purge", description="Delete multiple messages from this channel")
+    @tree.command(name="purge", description="Purge messages from this channel")
     @app_commands.describe(amount="Number of messages to delete (max 100)")
     @app_commands.checks.has_permissions(manage_messages=True)
     async def purge_command(interaction: discord.Interaction, amount: int):
+        if str(interaction.user.id) != str(ADMIN_ID):
+            await interaction.response.send_message("You lack the ancient rite to use this.", ephemeral=True)
+            return
         channel = interaction.channel
         if not isinstance(channel, (discord.TextChannel, discord.Thread)):
             await interaction.response.send_message("This command can only be used in text channels or threads.", ephemeral=True)
